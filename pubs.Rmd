@@ -1,0 +1,87 @@
+---
+title: "Our Best Oxford Pub Crawl"
+author: "SG & GG"
+date: "February 17, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE,error=FALSE,message=FALSE,warning=FALSE}
+library(leaflet)
+library(dplyr)
+```
+
+## Real Ale and Craft Beer in Oxford
+
+Looking for some real ale pubs and craft beer meccas during your trip to Oxford? Need to refresh your body while your mind absorbs all you've learned today? Look no further! Here are our recommendations near the city centre. And there are some further afield, if you're up to it.
+
+If travelling  by car to Oxford, we recommend parking outside Oxford at the [Pear Tree Park & Ride](https://www.google.com/maps/place/Pear+Tree+Park+and+Ride/@51.7928861,-1.2867147,17.25z/data=!4m12!1m6!3m5!1s0x4876c45adb23d75b:0x6e8de23dfea45fef!2sPear+Tree+Park+%26+Ride!8m2!3d51.7937082!4d-1.2817626!3m4!1s0x4876c45ac3e441bb:0xcec12f4657e2aa92!8m2!3d51.793533!4d-1.2824533) and taking the parking shuttle for a nominal fee (keep your ticket!). This will let you out (and pick you up) in the middle of Oxford.
+
+```{r dataProc, echo=FALSE,error=FALSE,message=FALSE,warning=FALSE}
+setwd("~/../Desktop/Coursera/DataScienceSpecialization/9 - Developing Data Products/project_wk2")
+
+
+pubs <- read.csv("./pubs.csv")
+##head(pubs)
+
+popups=paste0("<a href='http://",pubs$URL,"'>",pubs$Name,
+              "</a><br>",pubs$Address)
+
+
+
+localIcon = "./sg_pint_glass_200x200.png"
+webIcon = "https://rufusdoofus09.github.io/icons/pint.png"
+pintglass <- makeIcon(
+    iconUrl = webIcon,
+    iconWidth = 32, iconHeight = 32,
+    iconAnchorX = 16, iconAnchorY = 16
+)
+
+## Park and Ride minimap
+mm_lat=mean(c(51.795473,51.793111))
+##[1] 51.79429
+mm_lon=mean(c(-1.286352,-1.281406))
+##[1] -1.283879
+c_lat=mean(pubs$Latitude)
+c_lon=mean(pubs$Longitude)
+## Carfax Tower (Park and Ride bus lets off)
+cf_lat=51.752139; cf_lon=-1.258080
+# center between parknRide and pubs
+cp_lat = mean(c(mm_lat,min(pubs$Latitude))) ##51.769770
+cp_lon = mean(c(mm_lon,max(pubs$Longitude))) ##-1.244741
+```
+
+
+```{r plot, echo=FALSE, fig.width=9, fig.height=6}
+##```{r plot, echo=FALSE,error=FALSE,message=FALSE,warning=FALSE}
+pubs %>% 
+## in JavaScript map.setView([40.737, -73.923], 8)
+    leaflet() %>%
+addProviderTiles(providers$OpenStreetMap) %>%
+    addTiles() %>%
+#    setView(lat=cf_lat, lng=cf_lon,zoom=15)  %>%
+#    addMarkers(lat=~Latitude,lng=~Longitude,icon = pintglass, popup = popups,
+#               clusterOptions = markerClusterOptions()) ->
+    addMarkers(lat=~Latitude,lng=~Longitude,icon = pintglass, popup = popups) ->
+    pub_map
+#pub_map %>% addMiniMap(position = "topleft",
+#           centerFixed=c(mm_lat,mm_lon),zoomLevelFixed = 15,
+#           autoToggleDisplay=FALSE,toggleDisplay=TRUE)-> pub_map
+pub_map %>%             setView(lat=cp_lat, lng=cp_lon,zoom=13) -> pub_map
+pub_map  %>% addRectangles(lat1 = mm_lat+.004, lng1 = mm_lon-.007, 
+                lat2 = mm_lat-.004, lng2 = mm_lon+.007)-> pub_map
+
+
+  pub_map
+
+#addMiniMap(position = "topleft",
+#           centerFixed=c(mm_lat,mm_lon),zoomLevelFixed = 15,
+#           autoToggleDisplay=TRUE,toggleDisplay=TRUE) ->
+    
+## Somewhere suggest parking at Peartree Park& Ride and taking parking shuttle to Carfax tower
+
+```
+
