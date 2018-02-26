@@ -1,0 +1,50 @@
+---
+title: "Plotly Demonstration "
+author: "SG"
+date: "February 25, 2018"
+output: ioslides_presentation
+---
+
+### (use arrow keys to move between slides)
+
+# Description
+This plot uses the "state" data from the R datasets package. It shows murder rate per state relative to population density, illiteracy rate and average income. 
+
+Hover over points to see state information.  
+
+This just shows plotly features and is not meant to show anything of statistical import.
+
+
+---
+
+```{r 3dscatter, echo=FALSE,message=FALSE}
+library(plotly)
+library(dplyr)
+require(datasets)
+state_df=as_tibble(state.x77,rownames="State")
+state_df %>% mutate(abbr = state.abb,pop_dens = Population*1000/Area,
+                    HSgrad='HS Grad', LifeExp=`Life Exp`) -> state_df
+
+p <- plot_ly(state_df, type="scatter3d",mode="markers",
+             x = ~Illiteracy, y = ~Income, z = ~pop_dens, 
+             marker = list(color = ~Murder, colorscale = "Reds", 
+                  showscale = TRUE),
+                    text=~abbr) %>%
+    add_markers() %>%
+    layout(scene = list(xaxis = list(title = 'Illiteracy'),
+                        yaxis = list(title = 'Income'),
+                        zaxis = list(title = 'Population Density')),
+           annotations = list(
+               x = 1,
+               y = 1,
+               text = 'Murder Rate',
+               xref = 'paper',
+               yref = 'paper',
+              showarrow = FALSE
+            )
+    )
+
+
+p
+```
+
