@@ -25,54 +25,55 @@ UN_InfantDeath_all2009_2015File="UNdata_Export_20180301_220944747.csv"
 
 GHO_infantMortality_allYears_File = "GHO_infantMortality.csv"
 GHO_population_allYears_File = "GHO_population.csv"
-GHO_infantMortality<-read.csv(file.path(DataDir,GHO_infantMortality_allYears_File),stringsAsFactors = F)
-GHO_infantMortality %>% 
-    select(Country,Year,Mortality_Rate=Infant.mortality.rate..probability.of.dying.between.birth.and.age.1.per.1000.live.births.) -> 
-    GHO_infantMortality_1yr
-GHO_infantMortality_1yr_byYear<-spread(GHO_infantMortality_1yr,Year,Mortality_Rate)
-
-GHO_infantMortality_2015 <- select(GHO_infantMortality_1yr_byYear,Country,Mortality_Rate="2015")
-GHO_infantMortality_2015 %>% 
-    separate(Mortality_Rate,c("Mortality_Rate","error"),sep=" ") %>% 
-    as_tibble() %>%
-    select(Country,Mortality_Rate) %>%
-    mutate(Mortality_Rate=as.numeric(Mortality_Rate)) ->
-    GHO_infantMortality_2015
-
-GHO_infantMortality_2015
-
-
-
-
-
-GHO_population<-read.csv(file.path(DataDir,GHO_population_allYears_File),stringsAsFactors = F)
-
-hdr1<-names(GHO_population)
-hdr2<-GHO_population[1,]
-names(GHO_population)<-paste(hdr1,hdr2)
-GHO_population <- GHO_population[-1,]
-GHO_population %>% 
-    select(Country="X Country",Population_Thousands="Population..in.thousands..total 2015") ->
-    GHO_population_2015
-
-GHO_Mortality_Population <- merge(GHO_infantMortality_2015,GHO_population_2015,by="Country")
-
-weighted_mortality_rate <- GHO_Mortality_Population$Mortality_Rate*GHO_Mortality_Population$Population_Thousands
-weighted_mortality_rate_inclUS <- sum(weighted_mortality_rate)/sum(GHO_Mortality_Population$Population_Thousands)
-weighted_mortality_rate_noUS <- sum(weighted_mortality_rate[1:19])/sum(GHO_Mortality_Population$Population_Thousands[1:19])
-weighted_mortality_rate_US <- GHO_Mortality_Population$Mortality_Rate[20]
-
-# Live birth data country
-UN_LiveBirths_2003_2015 <- read.csv(file.path(DataDir,UN_LiveBirths_2003_2015_File),
-                                    stringsAsFactors = F)
-UN_LiveBirths_2003_2015 %>% filter(Month=="Total") -> UN_LiveBirths_2003_2015_total
-UN_LiveBirths_2003_2015_byReliability <-
-    spread(UN_LiveBirths_2003_2015_total,Reliability,Value)
-UN_LiveBirths_2003_2015_byReliability %>%
-    select(Country=Country.or.Area,Year,Final="Final figure, complete",Provisional="Provisional figure")
 
 formatWorldData <- function() {
-ICD10_causeCodes <- read.csv(file.path(DataDir,ICD10_causeCodesFile),
+    GHO_infantMortality<-read.csv(file.path(DataDir,GHO_infantMortality_allYears_File),stringsAsFactors = F)
+    GHO_infantMortality %>% 
+        select(Country,Year,Mortality_Rate=Infant.mortality.rate..probability.of.dying.between.birth.and.age.1.per.1000.live.births.) -> 
+        GHO_infantMortality_1yr
+    GHO_infantMortality_1yr_byYear<-spread(GHO_infantMortality_1yr,Year,Mortality_Rate)
+    
+    GHO_infantMortality_2015 <- select(GHO_infantMortality_1yr_byYear,Country,Mortality_Rate="2015")
+    GHO_infantMortality_2015 %>% 
+        separate(Mortality_Rate,c("Mortality_Rate","error"),sep=" ") %>% 
+        as_tibble() %>%
+        select(Country,Mortality_Rate) %>%
+        mutate(Mortality_Rate=as.numeric(Mortality_Rate)) ->
+        GHO_infantMortality_2015
+    
+    GHO_infantMortality_2015
+    
+    
+    
+    
+    
+    GHO_population<-read.csv(file.path(DataDir,GHO_population_allYears_File),stringsAsFactors = F)
+    
+    hdr1<-names(GHO_population)
+    hdr2<-GHO_population[1,]
+    names(GHO_population)<-paste(hdr1,hdr2)
+    GHO_population <- GHO_population[-1,]
+    GHO_population %>% 
+        select(Country="X Country",Population_Thousands="Population..in.thousands..total 2015") ->
+        GHO_population_2015
+    
+    GHO_Mortality_Population <- merge(GHO_infantMortality_2015,GHO_population_2015,by="Country")
+    
+    weighted_mortality_rate <- GHO_Mortality_Population$Mortality_Rate*GHO_Mortality_Population$Population_Thousands
+    weighted_mortality_rate_inclUS <- sum(weighted_mortality_rate)/sum(GHO_Mortality_Population$Population_Thousands)
+    weighted_mortality_rate_noUS <- sum(weighted_mortality_rate[1:19])/sum(GHO_Mortality_Population$Population_Thousands[1:19])
+    weighted_mortality_rate_US <- GHO_Mortality_Population$Mortality_Rate[20]
+    
+    # Live birth data country
+    UN_LiveBirths_2003_2015 <- read.csv(file.path(DataDir,UN_LiveBirths_2003_2015_File),
+                                        stringsAsFactors = F)
+    UN_LiveBirths_2003_2015 %>% filter(Month=="Total") -> UN_LiveBirths_2003_2015_total
+    UN_LiveBirths_2003_2015_byReliability <-
+        spread(UN_LiveBirths_2003_2015_total,Reliability,Value)
+    UN_LiveBirths_2003_2015_byReliability %>%
+        select(Country=Country.or.Area,Year,Final="Final figure, complete",Provisional="Provisional figure")
+    
+    ICD10_causeCodes <- read.csv(file.path(DataDir,ICD10_causeCodesFile),
                           stringsAsFactors = F,header = F,
                           col.names=c("skip","cause_code","cause_of_death"))
 ICD10_causeCodes %>% as_tibble() %>% mutate(skip=NULL) -> ICD10_causeCodes
