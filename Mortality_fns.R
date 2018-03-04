@@ -100,6 +100,10 @@ summ_UN_InfantDeath %>% ungroup() %>%
     group_by(Country.or.Area) %>% 
     mutate(latest=max(Year)) -> latest
 
+
+write.csv(GHO_infantMortality_2015,"./GHO_infantMortality_2015.csv",row.names = F)
+write.csv(GHO_Mortality_Population,"./GHO_Mortality_Population",row.names = F)
+
 #table(latest$Country.or.Area,latest$latest)
 #                                                     2008 2013 2014 2015
 #Australia                                               0    0    9    0
@@ -467,9 +471,9 @@ names(columnName_state) <- columnText_state
 
 names(columnName) <- columnText
 
-max_US_Mortality_rate_county<-max(county_summary$county_Mortality_rate)
-max_US_Mortality_rate_state<-max(state_summary$state_Mortality_rate)
-max_US_Mortality_rate<-max(max_US_Mortality_rate_county,max_US_Mortality_rate_state)
+# using data from the state dataset
+stateAbbr <- c(state.abb,"DC")
+names(stateAbbr) <- c(state.name,"District of Columbia")
 
 
 stateRegion <- c(as.character(state.region),"South")

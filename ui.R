@@ -5,20 +5,21 @@
 
 library(shiny)
 
-wd<-getwd()
-if (file.exists(file.path(wd,"..","Mortality_fns.R"))) {
-    LOCAL=TRUE
-} else {
-    LOCAL=FALSE
-}
+#wd<-getwd()
+#if (file.exists(file.path(wd,"..","Mortality_fns.R"))) {
+#    LOCAL=TRUE
+#} else {
+#    LOCAL=FALSE
+#}
 #LOCAL=FALSE
-if (LOCAL) {
-    file_dir=file.path("file://",wd,"..")
-    source(file.path(wd,"../Mortality_fns.R"))
-} else {
-    file_dir="https://raw.githubusercontent.com/rufusdoofus09/rufusdoofus09.github.io/master"
-    source(file.path(file_dir,"Mortality_fns.R"))
-}
+#if (LOCAL) {
+#    file_dir=file.path("file://",wd,"..")
+#    source(file.path(wd,"../Mortality_fns.R"))
+#} else {
+#    file_dir="https://raw.githubusercontent.com/rufusdoofus09/rufusdoofus09.github.io/master"
+#    source(file.path(file_dir,"Mortality_fns.R"))
+#}
+source("Mortality_fns.R")
 
 # Define UI 
 shinyUI(fluidPage(
@@ -51,13 +52,13 @@ shinyUI(fluidPage(
                         tabPanel(
                             "Graph", 
                             plotOutput("plot"),
-                            h3("Trend Details"),
-                            verbatimTextOutput("fit"),
-                            br(),
                             h3("Messages"),
                             textOutput("debug"),
                             br(),
-                            h4("This is a class project for the JHU Data Science Specialization and not a definitive source of data")
+                            h4("This is a class project for the JHU Data Science Specialization and not a definitive source of data"),
+                            br(),
+                            h3("Trend Details"),
+                            verbatimTextOutput("fit")
                         ), 
                         tabPanel("Info", 
                                  br(), 

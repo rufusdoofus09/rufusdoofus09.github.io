@@ -9,23 +9,38 @@ library(tidyr)
 library(rlang)
 
 
-wd<-getwd()
-if (file.exists(file.path(wd,"..","Mortality_fns.R"))) {
-    LOCAL=TRUE
-} else {
-    LOCAL=FALSE
-}
+#wd<-getwd()
+#if (file.exists(file.path(wd,"..","Mortality_fns.R"))) {
+#    LOCAL=TRUE
+#} else {
+#    LOCAL=FALSE
+#}
 #LOCAL=FALSE
-if (LOCAL) {
-    file_dir=file.path("file://",wd,"..")
-    source(file.path(wd,"../Mortality_fns.R"))
-} else {
-    file_dir="https://raw.githubusercontent.com/rufusdoofus09/rufusdoofus09.github.io/master"
-    source(file.path(file_dir,"Mortality_fns.R"))
-}
-state_summary <- read.csv(file.path(file_dir,"stateData.csv"),stringsAsFactors = F)
-county_summary <- read.csv(file.path(file_dir,"countyData.csv"),stringsAsFactors = F)
-GHO_infantMortality_2015 <- read.csv(file.path(file_dir,"GHO_infantMortality_2015.csv"),stringsAsFactors = F)
+#if (LOCAL) {
+#    file_dir=file.path("file://",wd,"..")
+#    source(file.path(wd,"../Mortality_fns.R"))
+#} else {
+#    file_dir="http://raw.githubusercontent.com/rufusdoofus09/rufusdoofus09.github.io/master"
+#    source(file.path(file_dir,"Mortality_fns.R"))
+#}
+#state_summary <- read.csv(file.path(file_dir,"stateData.csv"),stringsAsFactors = F)
+#county_summary <- read.csv(file.path(file_dir,"countyData.csv"),stringsAsFactors = F)
+#GHO_infantMortality_2015 <- read.csv(file.path(file_dir,"GHO_infantMortality_2015.csv"),stringsAsFactors = F)
+
+source("Mortality_fns.R")
+state_summary <- read.csv("stateData.csv",stringsAsFactors = F)
+county_summary <- read.csv("countyData.csv",stringsAsFactors = F)
+#GHO_infantMortality_2015 <- read.csv("GHO_infantMortality_2015.csv",stringsAsFactors = F)
+GHO_Mortality_Population <- read.csv("GHO_Mortality_Population.csv",stringsAsFactors = F)
+
+max_US_Mortality_rate_county<-max(county_summary$county_Mortality_rate)
+max_US_Mortality_rate_state<-max(state_summary$state_Mortality_rate)
+max_US_Mortality_rate<-max(max_US_Mortality_rate_county,max_US_Mortality_rate_state)
+
+weighted_mortality_rate <- GHO_Mortality_Population$Mortality_Rate*GHO_Mortality_Population$Population_Thousands
+weighted_mortality_rate_inclUS <- sum(weighted_mortality_rate)/sum(GHO_Mortality_Population$Population_Thousands)
+weighted_mortality_rate_noUS <- sum(weighted_mortality_rate[1:19])/sum(GHO_Mortality_Population$Population_Thousands[1:19])
+weighted_mortality_rate_US <- GHO_Mortality_Population$Mortality_Rate[20]
 
 state_colors = rainbow(50)
 region_colors = rainbow(5)
@@ -40,10 +55,10 @@ shinyServer <- function(input, output, session) {
             areaChoice <- input$area
             colText <- input$region_in
             if (areaChoice == 1) {
-                dataset = county_summary
+                dataset <- county_summary
                 colName <- paste0("county_",columnName[colText])
             } else {
-                dataset = state_summary
+                dataset <- state_summary
                 colName <- paste0("state_",columnName[colText])
             }
             field <- as.symbol(colName)
@@ -77,11 +92,11 @@ shinyServer <- function(input, output, session) {
             areaChoice <- input$area
             colText <- input$region_in
             if (areaChoice == 1) {
-                dataset = county_summary
+                dataset <- county_summary
                 colName <- paste0("county_",columnName[colText])
                 yName = "county_Mortality_rate"
             } else {
-                dataset = state_summary
+                dataset <- state_summary
                 colName <- paste0("state_",columnName[colText])
                 yName = "state_Mortality_rate"
             }
@@ -100,14 +115,14 @@ shinyServer <- function(input, output, session) {
         if (input$region_in != "") {
             areaChoice <- input$area
             if (areaChoice == 1) {
-                dataset = county_summary
-                ys = dataset$county_Mortality_rate
-                colors=state_colors[as.factor(dataset$state)]
+                dataset <- county_summary
+                ys <- dataset$county_Mortality_rate
+                colors<-state_colors[as.factor(dataset$state)]
                 }
             else {
-                dataset = state_summary
-                ys = dataset$state_Mortality_rate
-                colors=region_colors[as.factor(stateRegion[dataset$state])]
+                dataset <- state_summary
+                ys <- dataset$state_Mortality_rate
+                colors<-region_colors[as.factor(stateRegion[dataset$state])]
                 }
             colText <- input$region_in
             xs<-modelpred()
@@ -131,7 +146,7 @@ shinyServer <- function(input, output, session) {
         #print(fitMsg())
         fitMsg()
     })    
-    output$rateTable <- renderTable(GHO_infantMortality_2015)
+    output$rateTable <- renderTable(GHO_Mortality_Population[,1:2])
     output$colList <- renderTable(columnText,colnames = FALSE,spacing = "s")
     
 
