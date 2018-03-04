@@ -266,7 +266,8 @@ state_summary %>% print
 
                  
 zzz %>% group_by(county_group) %>% 
-    summarise(county_Deaths=sum(Deaths,na.rm = TRUE),
+    summarise(state=unique(state),
+              county_Deaths=sum(Deaths,na.rm = TRUE),
               county_Births=sum(Births,na.rm = TRUE),
               county_Mortality_rate = (county_Deaths*1000)/county_Births,
               county_HC01_VC03=sum(HC01_VC03,na.rm = TRUE),
@@ -468,3 +469,7 @@ names(columnName) <- columnText
 max_US_Mortality_rate_county<-max(county_summary$county_Mortality_rate)
 max_US_Mortality_rate_state<-max(state_summary$state_Mortality_rate)
 max_US_Mortality_rate<-max(max_US_Mortality_rate_county,max_US_Mortality_rate_state)
+
+
+stateRegion <- c(as.character(state.region),"South")
+names(stateRegion) <- stateAbbr
