@@ -1,11 +1,7 @@
 #
-# This is the server logic of a Shiny web application. You can run the 
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-# 
-#    http://shiny.rstudio.com/
-#
+# This is the server side definition for the "Mortality" Shiny web application.
+# JHU Data Science Specialization: Developing Data Products project
+# 4 March 2017
 
 library(shiny)
 library(dplyr)
@@ -19,6 +15,7 @@ if (file.exists(file.path(wd,"..","Mortality_fns.R"))) {
 } else {
     LOCAL=FALSE
 }
+#LOCAL=FALSE
 if (LOCAL) {
     file_dir=file.path("file://",wd,"..")
     source(file.path(wd,"../Mortality_fns.R"))

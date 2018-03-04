@@ -1,19 +1,24 @@
 #
-# This is the user-interface definition of a Shiny web application. You can
-# run the application by clicking 'Run App' above.
-##
-# This is the user-interface definition of a Shiny web application. You can
-# run the application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-# 
-#    http://shiny.rstudio.com/
-#
+# This is the user-interface definition for the "Mortality" Shiny web application.
+# JHU Data Science Specialization: Developing Data Products project
+# 4 March 2017
 
 library(shiny)
 
-wd<-"C:/Users/Susan/Desktop/Coursera/DataScienceSpecialization/9 - Developing Data Products/project_wk4"
-source(file.path(wd,"Mortality_fns.R"))
+wd<-getwd()
+if (file.exists(file.path(wd,"..","Mortality_fns.R"))) {
+    LOCAL=TRUE
+} else {
+    LOCAL=FALSE
+}
+#LOCAL=FALSE
+if (LOCAL) {
+    file_dir=file.path("file://",wd,"..")
+    source(file.path(wd,"../Mortality_fns.R"))
+} else {
+    file_dir="https://raw.githubusercontent.com/rufusdoofus09/rufusdoofus09.github.io/master"
+    source(file.path(file_dir,"Mortality_fns.R"))
+}
 
 # Define UI 
 shinyUI(fluidPage(
